@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/j2ee/dtds/web-app_2_3.dtd">
+
+<web-app>
+  <display-name>URL Mapping Viewer</display-name>
+
+    <filter>
+        <filter-name>app</filter-name>
+        <filter-class>com.ispnote.oauth2.filter.Oauth2Filter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>app</filter-name>
+        <servlet-name>app</servlet-name>
+    </filter-mapping>
+
+    <servlet>
+      <servlet-name>app</servlet-name>
+      <servlet-class>com.ispnote.servlet.AppServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+      <servlet-name>app</servlet-name>
+      <url-pattern>*.html</url-pattern>
+  </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+</web-app>
