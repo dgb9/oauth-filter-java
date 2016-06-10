@@ -16,6 +16,7 @@ public class Oauth2Session {
     private Set<String> access;
 
     private String token;
+    private String state;
 
     private Oauth2Session() {
         access = new TreeSet<String>();
@@ -57,6 +58,14 @@ public class Oauth2Session {
         this.token = token;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Oauth2Session{");
@@ -64,6 +73,7 @@ public class Oauth2Session {
         sb.append(", name='").append(name).append('\'');
         sb.append(", access=").append(access);
         sb.append(", token='").append(token).append('\'');
+        sb.append(", state='").append(state).append('\'');
         sb.append('}');
         return sb.toString();
     }

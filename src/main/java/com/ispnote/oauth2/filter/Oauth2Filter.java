@@ -1,16 +1,21 @@
 package com.ispnote.oauth2.filter;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * Created by dgb9 on 06/09/2016.
  */
 public class Oauth2Filter implements Filter {
-    public void init(FilterConfig filterConfig) throws ServletException {
+    private Oauth2Info data;
 
+    public void init(FilterConfig filterConfig) throws ServletException {
+        this.data = Oauth2InfoFactory.getInstance().getInfo();
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -32,7 +37,7 @@ public class Oauth2Filter implements Filter {
 
                 }
                 else {
-                    redirectToIdentityProvider();
+                    redirectToIdentityProvider(request, response);
                 }
             }
         }
@@ -41,7 +46,8 @@ public class Oauth2Filter implements Filter {
         }
     }
 
-    private void redirectToIdentityProvider() {
+    private void redirectToIdentityProvider(HttpServletRequest request, HttpServletResponse response) throws URISyntaxException {
+        URIBuilder builder = new URIBuilder(data.getAuthUrl());
         // TODO
     }
 
