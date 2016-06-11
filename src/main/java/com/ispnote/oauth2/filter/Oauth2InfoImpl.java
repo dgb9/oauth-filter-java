@@ -19,4 +19,12 @@ public class Oauth2InfoImpl implements Oauth2Info {
     public String getAuthUrl() {
         return "https://github.com/login/oauth/authorize";
     }
+
+    public String getScope() {
+        return "user"; // user means will get the user email address and the user id
+    }
+
+    public boolean isAllowSignup() {
+        return true; // let's allow people to signup to github
+    }
 }

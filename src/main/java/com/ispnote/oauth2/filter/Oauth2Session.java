@@ -5,6 +5,7 @@ import javax.servlet.http.HttpSession;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * Created by dgb9 on 06/09/2016.
@@ -20,6 +21,10 @@ public class Oauth2Session {
 
     private Oauth2Session() {
         access = new TreeSet<String>();
+
+        // create a new random uuid state string for the oauth protocol
+        // that will remain in the session object for verification
+        state = UUID.randomUUID().toString();
     }
 
     public String getLogin() {
@@ -60,10 +65,6 @@ public class Oauth2Session {
 
     public String getState() {
         return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
     @Override

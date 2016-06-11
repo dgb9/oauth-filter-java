@@ -31,10 +31,7 @@ public class Oauth2Filter implements Filter {
             }
             else {
                 if(isCallbackUrl()){
-
-                }
-                else if (isTokenUrl()){
-
+                    processCallback();
                 }
                 else {
                     redirectToIdentityProvider(request, response);
@@ -46,14 +43,28 @@ public class Oauth2Filter implements Filter {
         }
     }
 
-    private void redirectToIdentityProvider(HttpServletRequest request, HttpServletResponse response) throws URISyntaxException {
-        URIBuilder builder = new URIBuilder(data.getAuthUrl());
+    private void processCallback() {
         // TODO
     }
 
-    private boolean isTokenUrl() {
-        // TODO
-        return false;
+    private void redirectToIdentityProvider(HttpServletRequest request, HttpServletResponse response) throws URISyntaxException, IOException {
+
+        URIBuilder builder = new URIBuilder(data.getAuthUrl());
+
+        Oauth2Session sessionObject = Oauth2Session.getSessionObject(request);
+        String state = sessionObject.getState();
+        String allowSignup = Boolean.toString(data.isAllowSignup());
+
+        builder.addParameter(Oauth2Constants.PARAM_CLIENT_ID, data.getClientId());
+        builder.addParameter(Oauth2Constants.REDIRECT_URL, data.getCallbackUrl());
+        builder.addParameter(Oauth2Constants.PARAM_SCOPE, data.getScope());
+        builder.addParameter(Oauth2Constants.PARAM_STATE, state);
+
+        builder.addParameter(Oauth2Constants.PARAM_ALLOW_SIGNUP, allowSignup);
+
+        // get the url and proceed
+        String url = builder.toString();
+        response.sendRedirect(url); // send the redirect location header
     }
 
     private boolean isCallbackUrl() {
