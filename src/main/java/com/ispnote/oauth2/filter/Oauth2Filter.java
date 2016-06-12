@@ -30,8 +30,8 @@ public class Oauth2Filter implements Filter {
                 chain.doFilter(request, response);
             }
             else {
-                if(isCallbackUrl()){
-                    processCallback();
+                if(isCallbackUrl(request)){
+                    processCallback(request);
                 }
                 else {
                     redirectToIdentityProvider(request, response);
@@ -39,11 +39,15 @@ public class Oauth2Filter implements Filter {
             }
         }
         catch(Exception e){
-            // todo just log the difference
+            printError(response, "error while processing filter: " + e.getClass().getName() + ", " + e.getMessage());
         }
     }
 
-    private void processCallback() {
+    private void printError(HttpServletResponse response, String s) {
+        // TODO
+    }
+
+    private void processCallback(HttpServletRequest request) {
         // TODO
     }
 
@@ -67,12 +71,13 @@ public class Oauth2Filter implements Filter {
         response.sendRedirect(url); // send the redirect location header
     }
 
-    private boolean isCallbackUrl() {
-        // TODO
-        return false;
+    private boolean isCallbackUrl(HttpServletRequest request) {
+        String url = request.getRequestURL().toString();
+
+        return data.getCallbackUrl().equals(url);
     }
 
     public void destroy() {
-
+        // no implementation
     }
 }
