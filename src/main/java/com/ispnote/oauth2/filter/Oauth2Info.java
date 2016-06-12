@@ -5,9 +5,12 @@ package com.ispnote.oauth2.filter;
  */
 public interface Oauth2Info {
     String getClientId();
-    String getSecret();
+    String getClientSecret();
     String getCallbackUrl();
     String getAuthUrl();
+
+    String getTokenUrl();
+
     String getScope();
 
     boolean isAllowSignup();

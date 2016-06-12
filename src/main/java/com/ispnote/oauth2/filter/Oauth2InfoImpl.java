@@ -8,7 +8,7 @@ public class Oauth2InfoImpl implements Oauth2Info {
         return "de196ddc3e857f27bd02";
     }
 
-    public String getSecret() {
+    public String getClientSecret() {
         return "f7b9fabfac08673e80f978bdbbb806147ef518e3";
     }
 
@@ -18,6 +18,10 @@ public class Oauth2InfoImpl implements Oauth2Info {
 
     public String getAuthUrl() {
         return "https://github.com/login/oauth/authorize";
+    }
+
+    public String getTokenUrl(){
+        return "https://github.com/login/oauth/access_token";
     }
 
     public String getScope() {

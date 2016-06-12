@@ -1,12 +1,21 @@
 package com.ispnote.oauth2.filter;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by dgb9 on 06/09/2016.
@@ -31,7 +40,7 @@ public class Oauth2Filter implements Filter {
             }
             else {
                 if(isCallbackUrl(request)){
-                    processCallback(request);
+                    processCallback(request, response);
                 }
                 else {
                     redirectToIdentityProvider(request, response);
@@ -44,11 +53,86 @@ public class Oauth2Filter implements Filter {
     }
 
     private void printError(HttpServletResponse response, String s) {
-        // TODO
+        try {
+            PrintWriter writer = response.getWriter();
+
+            String pageText = loadTemplatePage();
+            pageText = pageText.replaceAll("@@placeholder@@", s);
+
+            writer.write(pageText);
+            writer.flush();
+            writer.close();
+        }
+        catch (Exception e) {
+            // no implementation
+        }
     }
 
-    private void processCallback(HttpServletRequest request) {
-        // TODO
+    private String loadTemplatePage() {
+        InputStream stream = this.getClass().getResourceAsStream("pagetemplate.html");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        StringBuilder buffer = new StringBuilder();
+        String endOfLine = System.getProperty("line.separator");
+
+        String line = null;
+        try {
+            do {
+                line = reader.readLine();
+
+                if (line != null) {
+                    buffer.append(line);
+                    buffer.append(endOfLine);
+                }
+            }
+            while (line != null);
+
+            stream.close();
+        }
+        catch (Exception e) {
+            // no implementation
+        }
+
+        return buffer.toString();
+    }
+
+    private void processCallback(HttpServletRequest request, HttpServletResponse response) {
+        // get the parameters
+        String state = request.getParameter(Oauth2Constants.PARAM_STATE);
+        state = state == null ? "" : state.trim();
+
+        String code = request.getParameter(Oauth2Constants.PARAM_CODE);
+
+        // check the base is equal with the stored information
+        try {
+            Oauth2Session session = Oauth2Session.getSessionObject(request);
+            if (state.equals(session.getState())) {
+                // call the POST and retrieve the token
+                HttpPost post = new HttpPost(data.getTokenUrl());
+
+                List<NameValuePair> list = new ArrayList<NameValuePair>();
+                list.add(new BasicNameValuePair(Oauth2Constants.PARAM_CLIENT_ID, data.getClientId()));
+                list.add(new BasicNameValuePair(Oauth2Constants.PARAM_CLIENT_SECRET, data.getClientSecret()));
+                list.add(new BasicNameValuePair(Oauth2Constants.PARAM_STATE, state));
+                list.add(new BasicNameValuePair(Oauth2Constants.PARAM_CODE, code));
+
+                post.setEntity(new UrlEncodedFormEntity(list));
+
+                HttpClient client = HttpClients.createDefault();
+                CloseableHttpResponse resp = (CloseableHttpResponse) client.execute(post);
+
+                // the response shall contain a json that has the token and other user information
+                // TODO
+            }
+            else {
+                printError(response, "error validating the random state");
+            }
+        }
+        catch (Exception e) {
+            printError(response, "error processing the callback post: " + e.getMessage());
+        }
+
+        // store the token in the session
+        // proceed with the chain filter processing
     }
 
     private void redirectToIdentityProvider(HttpServletRequest request, HttpServletResponse response) throws URISyntaxException, IOException {
