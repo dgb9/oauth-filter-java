@@ -12,10 +12,10 @@ import java.util.UUID;
  */
 public class Oauth2Session {
     private String login;
-    private String name;
+    private String id;
+    private String email;
 
     private Set<String> access;
-
     private String token;
     private String state;
 
@@ -35,12 +35,12 @@ public class Oauth2Session {
         this.login = login;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Set<String> getAccess() {
@@ -71,12 +71,21 @@ public class Oauth2Session {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Oauth2Session{");
         sb.append("login='").append(login).append('\'');
-        sb.append(", name='").append(name).append('\'');
+        sb.append(", id='").append(id).append('\'');
+        sb.append(", email='").append(email).append('\'');
         sb.append(", access=").append(access);
         sb.append(", token='").append(token).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public static Oauth2Session getSessionObject(HttpServletRequest req) {

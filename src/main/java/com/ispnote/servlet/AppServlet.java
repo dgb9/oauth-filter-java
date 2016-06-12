@@ -27,7 +27,7 @@ public class AppServlet extends HttpServlet{
 
             // print the items in the session object
             print(writer, "<span><b>login: </b>" + dt.getLogin() + "</span><br/>");
-            print(writer, "<span><b>full name: </b>" + dt.getName() + "</span><br/>");
+            print(writer, "<span><b>full name: </b>" + dt.getId() + "</span><br/>");
             print(writer, "<span><b>access information: </b>" + dt.getAccess() + "</span><br/>");
 
             print(writer, "</p>");

@@ -1,5 +1,6 @@
 package com.ispnote.oauth2.filter;
 
+import com.google.gson.Gson;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -40,7 +41,7 @@ public class Oauth2Filter implements Filter {
             }
             else {
                 if(isCallbackUrl(request)){
-                    processCallback(request, response);
+                    processCallback(request, response, chain);
                 }
                 else {
                     redirectToIdentityProvider(request, response);
@@ -68,34 +69,14 @@ public class Oauth2Filter implements Filter {
         }
     }
 
-    private String loadTemplatePage() {
-        InputStream stream = this.getClass().getResourceAsStream("pagetemplate.html");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder buffer = new StringBuilder();
-        String endOfLine = System.getProperty("line.separator");
+    private String loadTemplatePage() throws IOException {
+        Class<? extends Oauth2Filter> cls = this.getClass();
+        InputStream resourceStream = cls.getResourceAsStream("pagetemplate.html");
 
-        String line = null;
-        try {
-            do {
-                line = reader.readLine();
-
-                if (line != null) {
-                    buffer.append(line);
-                    buffer.append(endOfLine);
-                }
-            }
-            while (line != null);
-
-            stream.close();
-        }
-        catch (Exception e) {
-            // no implementation
-        }
-
-        return buffer.toString();
+        return getStreamContent(resourceStream, true);
     }
 
-    private void processCallback(HttpServletRequest request, HttpServletResponse response) {
+    private void processCallback(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
         // get the parameters
         String state = request.getParameter(Oauth2Constants.PARAM_STATE);
         state = state == null ? "" : state.trim();
@@ -120,8 +101,23 @@ public class Oauth2Filter implements Filter {
                 HttpClient client = HttpClients.createDefault();
                 CloseableHttpResponse resp = (CloseableHttpResponse) client.execute(post);
 
-                // the response shall contain a json that has the token and other user information
-                // TODO
+                InputStream input = resp.getEntity().getContent();
+                String json = getStreamContent(input, true);
+
+                // the json is supposed to contain the token the user id and the user email id
+                String token = getAuthorizationToken(json);
+
+                // check the token and get the login, id  and email
+                Oauth2Identification ident = checkToken(token);
+
+                // if everthing is ok, fill out the session object with the identification info and proceed
+                // with the filtering
+                session.setId(ident.getUserId());
+                session.setEmail(ident.getEmail());
+                session.setLogin(ident.getLogin());
+
+                // and now do the filter that will forward to the authenticated page
+                doFilter(request, response, chain);
             }
             else {
                 printError(response, "error validating the random state");
@@ -133,6 +129,39 @@ public class Oauth2Filter implements Filter {
 
         // store the token in the session
         // proceed with the chain filter processing
+    }
+
+    private Oauth2Identification checkToken(String token) {
+        // TODO
+        return null;
+    }
+
+    private String getAuthorizationToken(String json) {
+        // TODO
+        return null;
+    }
+
+    private String getStreamContent(InputStream input, boolean close) throws IOException {
+        byte[] bytes = new byte[1024];
+
+        StringBuilder buffer = new StringBuilder();
+        int count = 0;
+
+        do {
+            count = input.read(bytes);
+            if (count > 0) {
+                String strRead = new String(bytes, 0, count);
+
+                buffer.append(strRead);
+            }
+        }
+        while (count >= 0);
+
+        if (close) {
+            input.close();
+        }
+
+        return buffer.toString();
     }
 
     private void redirectToIdentityProvider(HttpServletRequest request, HttpServletResponse response) throws URISyntaxException, IOException {
