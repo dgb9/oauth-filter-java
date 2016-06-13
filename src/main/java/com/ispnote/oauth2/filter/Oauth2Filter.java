@@ -1,13 +1,21 @@
 package com.ispnote.oauth2.filter;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.message.BasicNameValuePair;
 
 import javax.servlet.*;
@@ -98,7 +106,8 @@ public class Oauth2Filter implements Filter {
 
                 post.setEntity(new UrlEncodedFormEntity(list));
 
-                HttpClient client = HttpClients.createDefault();
+                HttpClient client = getHttpClient();
+
                 CloseableHttpResponse resp = (CloseableHttpResponse) client.execute(post);
 
                 InputStream input = resp.getEntity().getContent();
@@ -115,6 +124,7 @@ public class Oauth2Filter implements Filter {
                 session.setId(ident.getUserId());
                 session.setEmail(ident.getEmail());
                 session.setLogin(ident.getLogin());
+                session.setToken(token);
 
                 // and now do the filter that will forward to the authenticated page
                 doFilter(request, response, chain);
@@ -127,18 +137,51 @@ public class Oauth2Filter implements Filter {
             printError(response, "error processing the callback post: " + e.getMessage());
         }
 
-        // store the token in the session
-        // proceed with the chain filter processing
     }
 
-    private Oauth2Identification checkToken(String token) {
-        // TODO
-        return null;
+    private HttpClient getHttpClient() {
+        HttpClient client = null;
+
+        if(data.isProxy()){
+            HttpClientBuilder bld = HttpClients.custom();
+
+            HttpHost proxy = new HttpHost(data.getProxyAddress(), data.getProxyPort());
+            DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+
+            client = bld.setRoutePlanner(routePlanner).build();
+        }
+        else {
+            client = HttpClients.createDefault();
+        }
+        return client;
+    }
+
+    private Oauth2Identification checkToken(String token) throws URISyntaxException, IOException {
+        URIBuilder builder = new URIBuilder(data.getVerifyTokenUrl());
+        builder.addParameter("access_token", token);
+        String strUrl = builder.toString();
+
+        HttpGet get = new HttpGet(strUrl);
+
+        HttpClient client = getHttpClient();
+
+        HttpResponse response = client.execute(get);
+        HttpEntity entity = response.getEntity();
+        InputStream stream = entity.getContent();
+        String content = getStreamContent(stream, true);
+
+        // content is being parsed as a
+        Gson gson = new Gson();
+        Oauth2Identification ident = gson.fromJson(content, Oauth2Identification.class);
+
+        return ident;
     }
 
     private String getAuthorizationToken(String json) {
-        // TODO
-        return null;
+        Gson gson = new Gson();
+        Oauth2JsonToken tokenHolder = gson.fromJson(json, Oauth2JsonToken.class);
+
+        return tokenHolder.getToken();
     }
 
     private String getStreamContent(InputStream input, boolean close) throws IOException {

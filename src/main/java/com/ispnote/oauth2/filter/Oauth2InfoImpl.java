@@ -31,4 +31,20 @@ public class Oauth2InfoImpl implements Oauth2Info {
     public boolean isAllowSignup() {
         return true; // let's allow people to signup to github
     }
+
+    public String getVerifyTokenUrl() {
+        return "https://api.github.com/user";
+    }
+
+    public boolean isProxy() {
+        return true;
+    }
+
+    public String getProxyAddress() {
+        return "webproxystatic-on.tsl.telus.com";
+    }
+
+    public int getProxyPort() {
+        return 8080;
+    }
 }

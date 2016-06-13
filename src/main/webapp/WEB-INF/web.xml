@@ -5,25 +5,25 @@
   "http://java.sun.com/j2ee/dtds/web-app_2_3.dtd">
 
 <web-app>
-  <display-id>URL Mapping Viewer</display-id>
+  <display-name>URL Mapping Viewer</display-name>
 
     <filter>
-        <filter-id>app</filter-id>
+        <filter-name>app</filter-name>
         <filter-class>com.ispnote.oauth2.filter.Oauth2Filter</filter-class>
     </filter>
 
     <filter-mapping>
-        <filter-id>app</filter-id>
-        <servlet-id>app</servlet-id>
+        <filter-name>app</filter-name>
+        <servlet-name>app</servlet-name>
     </filter-mapping>
 
     <servlet>
-      <servlet-id>app</servlet-id>
+      <servlet-name>app</servlet-name>
       <servlet-class>com.ispnote.servlet.AppServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-      <servlet-id>app</servlet-id>
+      <servlet-name>app</servlet-name>
       <url-pattern>*.html</url-pattern>
   </servlet-mapping>
 

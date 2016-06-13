@@ -14,4 +14,10 @@ public interface Oauth2Info {
     String getScope();
 
     boolean isAllowSignup();
+
+    String getVerifyTokenUrl();
+
+    boolean isProxy();
+    String getProxyAddress();
+    int getProxyPort();
 }
