@@ -9,7 +9,7 @@ public class Oauth2InfoImpl implements Oauth2Info {
     }
 
     public String getClientSecret() {
-        return "f7b9fabfac08673e80f978bdbbb806147ef518e3";
+        return "39170ce7f39804068792a3d840d38f334c35fa25";
     }
 
     public String getCallbackUrl() {
@@ -37,11 +37,11 @@ public class Oauth2InfoImpl implements Oauth2Info {
     }
 
     public boolean isProxy() {
-        return true;
+        return true; // by default proxy shall not be needed
     }
 
     public String getProxyAddress() {
-        return "webproxystatic-on.tsl.telus.com";
+        return "insert.proxy.here";
     }
 
     public int getProxyPort() {
