@@ -5,6 +5,7 @@ This is a simple Oauth2 filter. Many identity providers like github, google etc 
 their oauth capabilities to connect to their applications.
 
 How does it work:
+
 1. User accesses the application
 2. If user is not logged in, browser redirects to github for login
 3. Then github redirects back to the application
