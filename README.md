@@ -1,6 +1,6 @@
 # Simple Java Oauth2 Filter
 
-####### General
+###### General
 This is a simple Oauth2 filter. Many identity providers like github, google etc allow programmers to use
 their oauth capabilities to connect to their applications.
 
@@ -13,7 +13,7 @@ How does it work:
 6. A session object gets created
 7. Application gets redirected to the protected content (the one you require authentication for)
 
-####### Installation
+###### Installation
 As mentioned, this is a Java servlet filter. This should be installed on the top of your front controller only. What
 does this mean: if you use struts, install this on the top of the struts servlet. If you use Spring MVC, the filter
 shall be installed on the top of the dispatcher servlet.
@@ -34,7 +34,7 @@ Then do as follows:
 - Install your application and give it a try. If you are not logged in, you should be redirected to github to be logged in and then back to your application
 
 
-####### The Oauth2Info parameters
+###### The Oauth2Info parameters
 
 1. clientId: the client id provided by github upon setting up the application
 2. clientSecret: the client secret, as well provided by github
