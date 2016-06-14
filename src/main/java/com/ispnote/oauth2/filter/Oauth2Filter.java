@@ -1,7 +1,6 @@
 package com.ispnote.oauth2.filter;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -12,16 +11,18 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,9 @@ import java.util.List;
  * Created by dgb9 on 06/09/2016.
  */
 public class Oauth2Filter implements Filter {
+    private static final String ACCEPT_HEADER = "Accept";
+    private static final String APPLICATION_JSON = "application/json";
+
     private Oauth2Info data;
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -104,6 +108,8 @@ public class Oauth2Filter implements Filter {
                 list.add(new BasicNameValuePair(Oauth2Constants.PARAM_STATE, state));
                 list.add(new BasicNameValuePair(Oauth2Constants.PARAM_CODE, code));
 
+                post.addHeader(new BasicHeader("Accept", "application/json"));
+
                 post.setEntity(new UrlEncodedFormEntity(list));
 
                 HttpClient client = getHttpClient();
@@ -122,7 +128,7 @@ public class Oauth2Filter implements Filter {
                 // if everthing is ok, fill out the session object with the identification info and proceed
                 // with the filtering
                 session.setId(ident.getUserId());
-                session.setEmail(ident.getEmail());
+                session.setName(ident.getName());
                 session.setLogin(ident.getLogin());
                 session.setToken(token);
 
@@ -162,6 +168,7 @@ public class Oauth2Filter implements Filter {
         String strUrl = builder.toString();
 
         HttpGet get = new HttpGet(strUrl);
+        get.addHeader(new BasicHeader(ACCEPT_HEADER, APPLICATION_JSON));
 
         HttpClient client = getHttpClient();
 
