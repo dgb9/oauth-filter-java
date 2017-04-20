@@ -2,18 +2,20 @@ package com.ispnote.oauth2.filter;
 
 /**
  * Created by dgabrove on 06/10/2016.
+ *
+ * Please make sure you write the right client id and client secret as defined on github
  */
 public class Oauth2InfoImpl implements Oauth2Info {
     public String getClientId() {
-        return "de196ddc3e857f27bd02";
+        return "the client id";
     }
 
     public String getClientSecret() {
-        return "39170ce7f39804068792a3d840d38f334c35fa25";
+        return "secret value";
     }
 
     public String getCallbackUrl() {
-        return "http://localhost:8080/oauth/callback.html";
+        return "http://localhost:8080/test1/callback.html";
     }
 
     public String getAuthUrl() {
@@ -37,7 +39,7 @@ public class Oauth2InfoImpl implements Oauth2Info {
     }
 
     public boolean isProxy() {
-        return true; // by default proxy shall not be needed
+        return false; // by default proxy shall not be needed
     }
 
     public String getProxyAddress() {

@@ -1,0 +1,18 @@
+<project name="deployment" basedir="." default="all">
+
+    <property name="target.folder" value="/home/dgabrov/IdeaProjects/oauth-filter-java/target"/>
+    <property name="war.file" value="${target.folder}/oauth.war" />
+    <property name="destination" value="/home/dgabrov/software/apache-tomcat-8.5.14/webapps/test1" />
+
+    <target name="all">
+        <echo message="building project for deployment..." />
+
+        <unzip dest="${destination}">
+            <fileset dir="${target.folder">
+                <include name="oauth.war"/>
+            </fileset>
+        </unzip>
+
+        <touch file="${destination}/WEB-INF/web.xml"/>
+    </target>
+</project>
